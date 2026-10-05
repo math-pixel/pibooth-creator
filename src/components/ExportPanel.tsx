@@ -58,27 +58,30 @@ export default function ExportPanel() {
         </ul>
       )}
 
-      <div className="export-group">
-        <span className="export-group-label">Requis pour pibooth</span>
-        <button className="primary" onClick={download} disabled={layoutsCount === 0}>
-          Télécharger picture_template.xml
-        </button>
-        <button className="secondary" onClick={copy} disabled={layoutsCount === 0}>
-          {copied ? 'Copié !' : 'Copier le XML'}
-        </button>
-      </div>
-      <p className="hint-small">
-        Les deux font la même chose : vous donnent le fichier à placer dans <code>PICTURE.template</code> de{' '}
-        <code>pibooth.cfg</code>.
+      <h3 className="export-subtitle">Requis pour pibooth</h3>
+      <p className="hint-small export-description">
+        Ce fichier est le seul dont pibooth a besoin pour afficher vos mises en page.
       </p>
-
-      <div className="export-group">
-        <span className="export-group-label">Optionnel</span>
-        <button className="secondary" onClick={downloadZip} disabled={layoutsCount === 0 || zipping}>
-          {zipping ? 'Préparation…' : `Dossier complet (.zip, ${imagesCount} image(s))`}
-        </button>
+      <div className="info-box">
+        Placez <code>picture_template.xml</code> où vous voulez sur le Raspberry Pi, puis indiquez son chemin dans{' '}
+        <code>pibooth.cfg</code> :
+        <pre>
+          [PICTURE]{'\n'}
+          template = /chemin/vers/picture_template.xml
+        </pre>
       </div>
+      <button className="primary" onClick={download} disabled={layoutsCount === 0}>
+        Télécharger picture_template.xml
+      </button>
+      <button className="secondary" onClick={copy} disabled={layoutsCount === 0}>
+        {copied ? 'Copié !' : 'Copier le XML'}
+      </button>
+
+      <h3 className="export-subtitle">Optionnel</h3>
       <p className="hint-small">Sauvegarde pratique (images + projet réimportable) — pibooth n'en a pas besoin.</p>
+      <button className="secondary" onClick={downloadZip} disabled={layoutsCount === 0 || zipping}>
+        {zipping ? 'Préparation…' : `Dossier complet (.zip, ${imagesCount} image(s))`}
+      </button>
     </section>
   );
 }

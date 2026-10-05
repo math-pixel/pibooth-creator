@@ -1,6 +1,7 @@
 import { useStore, getActiveLayout } from '../store';
 import type { Layer } from '../types';
 import { round2 } from '../utils';
+import ExportPanel from './ExportPanel';
 
 function layerLabel(layer: Layer): string {
   if (layer.kind === 'image') return `🖼 ${layer.label}`;
@@ -145,6 +146,7 @@ export default function RightPanel() {
     <aside className="right-panel">
       <LayersPanel />
       <PropertiesPanel />
+      <ExportPanel />
     </aside>
   );
 }
