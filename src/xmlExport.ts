@@ -109,7 +109,8 @@ export function validateProject(project: Project): string[] {
     const count = Number(countStr) as CaptureCount;
     (['portrait', 'landscape'] as Orientation[]).forEach((orientation) => {
       const layout = project.layouts[layoutKey(count, orientation)];
-      if (!layout.enabled) return;
+      // Skip layouts the user never touched -- only warn about ones with actual content.
+      if (!layout.enabled || layout.layers.length === 0) return;
       const captures = layout.layers.filter((l): l is CaptureLayer => l.kind === 'capture');
       const numbers = new Set(captures.map((c) => c.number));
       if (captures.length === 0) {

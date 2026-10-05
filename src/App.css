@@ -75,10 +75,14 @@
   display: grid;
   grid-template-columns: 340px 1fr;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .sidebar {
   overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
   padding: 20px;
   background: var(--color-bone);
   display: flex;
@@ -95,6 +99,7 @@
 
 .app-main {
   overflow: auto;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -291,7 +296,9 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 7px 10px;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 7px 6px;
 }
 
 .text-buttons {
