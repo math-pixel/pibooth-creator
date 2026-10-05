@@ -1,40 +1,43 @@
 # Pibooth Creator
 
-Éditeur visuel pour créer des templates compatibles avec le plugin
-[pibooth-picture-template](https://github.com/pibooth/pibooth-picture-template), sans passer par
-l'éditeur ML (Flowchart Maker / draw.io) qui n'est pas intuitif pour les débutants.
+Visual editor for building templates compatible with the
+[pibooth-picture-template](https://github.com/pibooth/pibooth-picture-template) plugin, without going
+through the ML editor (Flowchart Maker / draw.io), which isn't very intuitive for beginners.
 
-## Fonctionnalités
+## Features
 
-- Choix du format de page (4x6", 2x6" bande photo, 5x7", 6x8" ou personnalisé) et de la résolution (DPI).
-- Pour chaque nombre de photos (1 à 4) et chaque orientation (portrait / paysage) :
-  - Ajout d'images de fond (background) et de premier plan (foreground / cadre), positionnables et
-    redimensionnables librement, avec gestion de l'ordre des calques (z-index).
-  - Ajout de zones photo numérotées (1 à 4), déplaçables, redimensionnables et pivotables à la souris.
-  - Ajout de zones de texte (`footer_text1`, `footer_text2`) supportées par le plugin.
-  - Bouton pour dupliquer une mise en page portrait vers le paysage (rotation automatique des zones).
-- Export en un clic vers un fichier `picture_template.xml` directement utilisable par le plugin
-  (format `mxGraphModel` natif, aucune dépendance à draw.io).
+- Choose the page size (4x6", 2x6" photo strip, 5x7", 6x8", or custom) and the resolution (DPI).
+- For each photo count (1 to 4) and each orientation (portrait / landscape):
+  - Add background and foreground (frame) images, freely positionable and resizable, with layer
+    ordering (z-index) control.
+  - Add numbered photo zones (1 to 4), draggable, resizable, and rotatable with the mouse.
+  - Add text zones (`footer_text1`, `footer_text2`) supported by the plugin.
+  - Button to duplicate a portrait layout into landscape (automatic rotation of the zones).
+- One-click export to a `picture_template.xml` file directly usable by the plugin (native
+  `mxGraphModel` format, no dependency on draw.io).
+- Import an existing `.xml` template (even one made by hand in draw.io) or a `.zip` project exported
+  from this app.
+- Undo/redo (Ctrl+Z / Ctrl+Y).
 
-## Utilisation
+## Usage
 
 ```bash
 npm install
 npm run dev
 ```
 
-Puis ouvrez `http://localhost:5173`.
+Then open `http://localhost:5173`.
 
-## Utiliser le template généré dans pibooth
+## Using the generated template in pibooth
 
-1. Téléchargez `picture_template.xml` depuis l'application.
-2. Placez-le à l'endroit de votre choix (ex: `~/.config/pibooth/picture_template.xml`).
-3. Dans `pibooth.cfg`, section `[PICTURE]`, renseignez :
+1. Download `picture_template.xml` from the app.
+2. Place it anywhere you like (e.g. `~/.config/pibooth/picture_template.xml`).
+3. In `pibooth.cfg`, under the `[PICTURE]` section, set:
    ```ini
    [PICTURE]
-   template = /chemin/vers/picture_template.xml
+   template = /path/to/picture_template.xml
    ```
-4. Redémarrez pibooth.
+4. Restart pibooth.
 
-Seules les combinaisons (nombre de photos × orientation) que vous avez activées et pour lesquelles
-vous avez défini des zones photo sont incluses dans l'export — inutile de tout créer d'un coup.
+Only the combinations (photo count × orientation) you've enabled and defined photo zones for are
+included in the export — no need to create everything at once.

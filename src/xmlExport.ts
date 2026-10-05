@@ -114,12 +114,12 @@ export function validateProject(project: Project): string[] {
       const captures = layout.layers.filter((l): l is CaptureLayer => l.kind === 'capture');
       const numbers = new Set(captures.map((c) => c.number));
       if (captures.length === 0) {
-        warnings.push(`${count} photo(s) / ${orientation} : aucune zone photo définie.`);
+        warnings.push(`${count} photo(s) / ${orientation}: no photo zone defined.`);
       } else if (numbers.size !== count) {
         warnings.push(
-          `${count} photo(s) / ${orientation} : il faut exactement les numéros 1 à ${count} (trouvé: ${[...numbers]
+          `${count} photo(s) / ${orientation}: needs exactly the numbers 1 to ${count} (found: ${[...numbers]
             .sort()
-            .join(', ') || 'aucun'}).`
+            .join(', ') || 'none'}).`
         );
       }
     });

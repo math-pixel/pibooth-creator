@@ -14,7 +14,7 @@ import { createEmptyLayouts, genId, getPageSizeIn } from './utils';
 
 function defaultProject(): Project {
   return {
-    name: 'Mon template pibooth',
+    name: 'My pibooth template',
     dpi: 600,
     pageSizeId: '4x6',
     customShortIn: 4,
@@ -121,7 +121,7 @@ export const useStore = create<EditorState>((set, get) => ({
         activeOrientation: 'landscape' as Orientation,
         toasts: [
           ...s.toasts,
-          { id: genId('toast'), message: 'Mise en page paysage générée depuis le portrait', tone: 'success' as const },
+          { id: genId('toast'), message: 'Landscape layout generated from portrait', tone: 'success' as const },
         ],
       };
     }),
@@ -146,7 +146,7 @@ export const useStore = create<EditorState>((set, get) => ({
       const newLayers =
         position === 'background' ? [layer, ...layout.layers] : [...layout.layers, layer];
       layouts[key] = { ...layout, layers: newLayers };
-      const toastMsg = position === 'background' ? 'Image de fond ajoutée' : 'Image de premier plan ajoutée';
+      const toastMsg = position === 'background' ? 'Background image added' : 'Foreground image added';
       return {
         project: { ...s.project, layouts },
         selectedLayerId: layer.id,

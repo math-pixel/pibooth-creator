@@ -13,7 +13,7 @@ export function serializeProjectJson(project: Project): string {
 export function deserializeProjectJson(json: string): Project {
   const data = JSON.parse(json);
   if (!data || typeof data !== 'object' || !data.layouts) {
-    throw new TemplateImportError('Fichier project.json invalide.');
+    throw new TemplateImportError('Invalid project.json file.');
   }
   return data as Project;
 }
@@ -75,7 +75,7 @@ export async function importProjectFromFile(file: File): Promise<ImportOutcome> 
     }
     const xmlFile = zip.file(/\.xml$/i)[0];
     if (!xmlFile) {
-      throw new TemplateImportError("Ce .zip ne contient ni project.json ni fichier .xml exploitable.");
+      throw new TemplateImportError('This .zip contains neither a project.json nor a usable .xml file.');
     }
     const xmlText = await xmlFile.async('text');
     const { project, warnings } = parseTemplateXml(xmlText);
@@ -93,7 +93,7 @@ export async function importProjectFromFile(file: File): Promise<ImportOutcome> 
     return { project, warnings, source: 'xml' };
   }
 
-  throw new TemplateImportError('Format non reconnu : utilisez un fichier .xml, .zip ou .json.');
+  throw new TemplateImportError('Unrecognized format: use an .xml, .zip, or .json file.');
 }
 
 export function countEmbeddedImages(project: Project): number {

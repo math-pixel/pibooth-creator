@@ -222,9 +222,9 @@ export default function CanvasEditor() {
       <div className="canvas-page" style={{ width: pageWidthPx, height: pageHeightPx }}>
         {layout.layers.length === 0 && (
           <div className="canvas-empty-hint">
-            Ajoutez une image de fond ou une zone photo
+            Add a background image or a photo zone
             <br />
-            depuis le panneau de gauche pour commencer.
+            from the left panel to get started.
           </div>
         )}
         <Stage
@@ -285,9 +285,9 @@ export default function CanvasEditor() {
         </Stage>
       </div>
       <p className="canvas-hint">
-        Page {activeOrientation === 'portrait' ? 'portrait' : 'paysage'} — {widthIn}&quot; × {heightIn}&quot;. Glissez pour
-        déplacer (aimantation au centre et aux bords), redimensionnez avec les poignées, <kbd>Suppr</kbd> pour
-        effacer, flèches pour ajuster finement.
+        {activeOrientation === 'portrait' ? 'Portrait' : 'Landscape'} page — {widthIn}&quot; × {heightIn}&quot;. Drag to
+        move (snaps to center and edges), resize with the handles, <kbd>Delete</kbd> to remove,
+        arrow keys to nudge.
       </p>
     </div>
   );

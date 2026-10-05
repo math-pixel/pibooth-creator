@@ -39,10 +39,10 @@ function UndoRedoButtons() {
 
   return (
     <div className="undo-redo-group">
-      <button className="icon-button" title="Annuler (Ctrl+Z)" onClick={undo} disabled={!canUndo}>
+      <button className="icon-button" title="Undo (Ctrl+Z)" onClick={undo} disabled={!canUndo}>
         ↶
       </button>
-      <button className="icon-button" title="Rétablir (Ctrl+Y)" onClick={redo} disabled={!canRedo}>
+      <button className="icon-button" title="Redo (Ctrl+Y)" onClick={redo} disabled={!canRedo}>
         ↷
       </button>
     </div>
@@ -57,7 +57,7 @@ export default function App() {
       <header className="app-header">
         <div>
           <h1>Pibooth Creator</h1>
-          <p>Créez visuellement vos templates pour le plugin pibooth-picture-template, sans XML ni éditeur de diagramme.</p>
+          <p>Visually build templates for the pibooth-picture-template plugin — no XML, no diagram editor.</p>
         </div>
         <UndoRedoButtons />
       </header>

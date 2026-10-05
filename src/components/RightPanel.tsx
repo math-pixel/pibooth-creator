@@ -21,8 +21,8 @@ function LayersPanel() {
 
   return (
     <section>
-      <h2>Calques (haut → bas)</h2>
-      {ordered.length === 0 && <p className="hint-small">Aucun élément. Ajoutez une image ou une zone photo.</p>}
+      <h2>Layers (top → bottom)</h2>
+      {ordered.length === 0 && <p className="hint-small">No elements yet. Add an image or a photo zone.</p>}
       <ul className="layers-list">
         {ordered.map((layer) => (
           <li key={layer.id} className={layer.id === selectedLayerId ? 'selected' : ''}>
@@ -30,13 +30,13 @@ function LayersPanel() {
               {layerLabel(layer)}
             </button>
             <div className="layer-actions">
-              <button title="Monter" onClick={() => moveLayer(layer.id, 'up')}>
+              <button title="Move up" onClick={() => moveLayer(layer.id, 'up')}>
                 ↑
               </button>
-              <button title="Descendre" onClick={() => moveLayer(layer.id, 'down')}>
+              <button title="Move down" onClick={() => moveLayer(layer.id, 'down')}>
                 ↓
               </button>
-              <button title="Supprimer" onClick={() => removeLayer(layer.id)}>
+              <button title="Delete" onClick={() => removeLayer(layer.id)}>
                 ✕
               </button>
             </div>
@@ -56,18 +56,18 @@ function PropertiesPanel() {
   if (!layer) {
     return (
       <section>
-        <h2>Propriétés</h2>
-        <p className="hint-small">Sélectionnez un élément sur le canevas pour voir ses propriétés.</p>
+        <h2>Properties</h2>
+        <p className="hint-small">Select an element on the canvas to see its properties.</p>
       </section>
     );
   }
 
   return (
     <section>
-      <h2>Propriétés</h2>
+      <h2>Properties</h2>
       <div className="row">
         <label>
-          X (po)
+          X (in)
           <input
             type="number"
             step="0.05"
@@ -76,7 +76,7 @@ function PropertiesPanel() {
           />
         </label>
         <label>
-          Y (po)
+          Y (in)
           <input
             type="number"
             step="0.05"
@@ -87,7 +87,7 @@ function PropertiesPanel() {
       </div>
       <div className="row">
         <label>
-          Largeur (po)
+          Width (in)
           <input
             type="number"
             step="0.05"
@@ -97,7 +97,7 @@ function PropertiesPanel() {
           />
         </label>
         <label>
-          Hauteur (po)
+          Height (in)
           <input
             type="number"
             step="0.05"
@@ -118,7 +118,7 @@ function PropertiesPanel() {
       </label>
       {layer.kind === 'capture' && (
         <label>
-          Numéro de la photo
+          Photo number
           <select
             value={layer.number}
             onChange={(e) => updateLayer(layer.id, { number: Number(e.target.value) as 1 | 2 | 3 | 4 })}
@@ -133,8 +133,8 @@ function PropertiesPanel() {
       )}
       {layer.kind === 'text' && (
         <p className="hint-small">
-          Emplacement uniquement : le texte affiché vient de <code>pibooth.cfg</code> (
-          <code>{layer.key.startsWith('footer') ? layer.key : `footer_text${layer.key}`}</code>), pas du XML.
+          Placement only: the displayed text comes from <code>pibooth.cfg</code> (
+          <code>{layer.key.startsWith('footer') ? layer.key : `footer_text${layer.key}`}</code>), not the XML.
         </p>
       )}
     </section>

@@ -61,21 +61,21 @@ export default function Sidebar() {
       if (
         warnings.length === 0 ||
         window.confirm(
-          `${warnings.length} page(s) ignorée(s) ou ajustée(s) pendant l'import :\n\n${warnings.join('\n')}\n\nContinuer quand même ?`
+          `${warnings.length} page(s) skipped or adjusted during import:\n\n${warnings.join('\n')}\n\nContinue anyway?`
         )
       ) {
         loadProject(imported);
         if (totalLayers === 0) {
-          pushToast("Projet importé, mais il ne contient aucun calque (fichier vide ?)", 'warning');
+          pushToast('Project imported, but it has no layers (empty file?)', 'warning');
         } else {
           pushToast(
-            source === 'project-json' ? 'Projet importé (état complet restauré)' : 'Template XML importé et reconstruit',
+            source === 'project-json' ? 'Project imported (full state restored)' : 'XML template imported and rebuilt',
             'success'
           );
         }
       }
     } catch (err) {
-      pushToast(err instanceof Error ? err.message : "Échec de l'import.", 'warning');
+      pushToast(err instanceof Error ? err.message : 'Import failed.', 'warning');
     }
   }
 
@@ -88,20 +88,20 @@ export default function Sidebar() {
     <aside className="sidebar">
       <section>
         <div className="section-header-row">
-          <h2>Projet</h2>
+          <h2>Project</h2>
           <div className="link-row">
             <button className="link-button" onClick={() => importInputRef.current?.click()}>
-              Importer
+              Import
             </button>
             <button
               className="link-button"
               onClick={() => {
-                if (window.confirm('Repartir sur un nouveau projet ? Le travail en cours sera perdu.')) {
+                if (window.confirm('Start a new project? Current work will be lost.')) {
                   resetProject();
                 }
               }}
             >
-              Nouveau projet
+              New project
             </button>
           </div>
           <input
@@ -116,15 +116,15 @@ export default function Sidebar() {
           />
         </div>
         <p className="hint-small">
-          Importez un <code>picture_template.xml</code> existant (même fait à la main sous draw.io) ou un projet .zip
-          exporté depuis cette application.
+          Import an existing <code>picture_template.xml</code> (even one made by hand in draw.io) or a .zip project
+          exported from this app.
         </p>
         <label>
-          Nom du template
+          Template name
           <input value={project.name} onChange={(e) => setProjectName(e.target.value)} />
         </label>
         <label>
-          Format de page
+          Page size
           <select value={project.pageSizeId} onChange={(e) => setPageSizeId(e.target.value)}>
             {PAGE_SIZE_PRESETS.map((p) => (
               <option key={p.id} value={p.id}>
@@ -136,7 +136,7 @@ export default function Sidebar() {
         {project.pageSizeId === 'custom' && (
           <div className="row">
             <label>
-              Côté court (po)
+              Short side (in)
               <input
                 type="number"
                 step="0.1"
@@ -146,7 +146,7 @@ export default function Sidebar() {
               />
             </label>
             <label>
-              Côté long (po)
+              Long side (in)
               <input
                 type="number"
                 step="0.1"
@@ -158,7 +158,7 @@ export default function Sidebar() {
           </div>
         )}
         <label>
-          Résolution (DPI)
+          Resolution (DPI)
           <input
             type="number"
             step="50"
@@ -171,7 +171,7 @@ export default function Sidebar() {
       </section>
 
       <section>
-        <h2>Mise en page</h2>
+        <h2>Layout</h2>
         <div className="count-tabs">
           {COUNTS.map((c) => {
             const status = tabStatus(project, c);
@@ -194,7 +194,7 @@ export default function Sidebar() {
               className={o === activeOrientation ? 'active' : ''}
               onClick={() => setActiveOrientation(o)}
             >
-              {o === 'portrait' ? 'Portrait' : 'Paysage'}
+              {o === 'portrait' ? 'Portrait' : 'Landscape'}
             </button>
           ))}
         </div>
@@ -204,21 +204,21 @@ export default function Sidebar() {
             checked={layout?.enabled ?? false}
             onChange={(e) => setLayoutEnabled(e.target.checked)}
           />
-          Inclure cette mise en page dans l'export
+          Include this layout in the export
         </label>
         {activeOrientation === 'landscape' && portraitLayout?.layers.length > 0 && (
           <button className="secondary" onClick={duplicateFromPortrait}>
-            Dupliquer depuis le portrait (pivoter 90°)
+            Duplicate from portrait (rotate 90°)
           </button>
         )}
         <p className="hint-small">
-          {captureNumbersUsed}/{activeCount} zone(s) photo définie(s) pour cette mise en page.
+          {captureNumbersUsed}/{activeCount} photo zone(s) defined for this layout.
         </p>
       </section>
 
       <section>
-        <h2>Ajouter des éléments</h2>
-        <button className="primary" onClick={() => bgInputRef.current?.click()}>+ Image de fond</button>
+        <h2>Add elements</h2>
+        <button className="primary" onClick={() => bgInputRef.current?.click()}>+ Background image</button>
         <input
           ref={bgInputRef}
           type="file"
@@ -227,9 +227,9 @@ export default function Sidebar() {
           onChange={(e) => handleUpload(e.target.files?.[0], 'background')}
         />
         <button className="primary" onClick={addCaptureLayer} disabled={captureNumbersUsed >= activeCount}>
-          + Zone photo
+          + Photo zone
         </button>
-        <button className="primary" onClick={() => fgInputRef.current?.click()}>+ Image de premier plan</button>
+        <button className="primary" onClick={() => fgInputRef.current?.click()}>+ Foreground image</button>
         <input
           ref={fgInputRef}
           type="file"
@@ -239,16 +239,16 @@ export default function Sidebar() {
         />
         <div className="text-buttons">
           <button className="secondary" onClick={() => addTextLayer('footer_text1')}>
-            + Texte pied 1
+            + Footer text 1
           </button>
           <button className="secondary" onClick={() => addTextLayer('footer_text2')}>
-            + Texte pied 2
+            + Footer text 2
           </button>
         </div>
         <p className="hint-small">
-          Ces zones ne définissent que l'<strong>emplacement</strong> du texte. Le contenu affiché (la date, un
-          message…) est choisi dans <code>pibooth.cfg</code> (<code>[PICTURE] footer_text1</code> /{' '}
-          <code>footer_text2</code>), pas ici — on ne peut pas mettre de texte libre dans le XML.
+          These zones only define the <strong>placement</strong> of the text. The displayed content (the date, a
+          message…) is set in <code>pibooth.cfg</code> (<code>[PICTURE] footer_text1</code> /{' '}
+          <code>footer_text2</code>), not here — you can't put free-form text in the XML.
         </p>
       </section>
     </aside>

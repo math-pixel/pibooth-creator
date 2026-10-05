@@ -24,14 +24,14 @@ export default function ExportPanel() {
   function download() {
     const xml = buildTemplateXml(project);
     downloadBlob(new Blob([xml], { type: 'application/xml' }), 'picture_template.xml');
-    pushToast('picture_template.xml téléchargé', 'success');
+    pushToast('picture_template.xml downloaded', 'success');
   }
 
   async function copy() {
     const xml = buildTemplateXml(project);
     await navigator.clipboard.writeText(xml);
     setCopied(true);
-    pushToast('XML copié dans le presse-papiers', 'success');
+    pushToast('XML copied to clipboard', 'success');
     setTimeout(() => setCopied(false), 1500);
   }
 
@@ -40,7 +40,7 @@ export default function ExportPanel() {
     try {
       const blob = await buildProjectZip(project);
       downloadBlob(blob, `${project.name.replace(/[^a-z0-9_-]+/gi, '_') || 'pibooth-template'}.zip`);
-      pushToast('Dossier projet (.zip) téléchargé', 'success');
+      pushToast('Project folder (.zip) downloaded', 'success');
     } finally {
       setZipping(false);
     }
@@ -49,7 +49,7 @@ export default function ExportPanel() {
   return (
     <section>
       <h2>Export</h2>
-      <p className="hint-small">{layoutsCount} mise(s) en page prête(s) à être exportée(s).</p>
+      <p className="hint-small">{layoutsCount} layout(s) ready to export.</p>
       {warnings.length > 0 && (
         <ul className="warnings">
           {warnings.map((w) => (
@@ -58,29 +58,31 @@ export default function ExportPanel() {
         </ul>
       )}
 
-      <h3 className="export-subtitle">Requis pour pibooth</h3>
+      <h3 className="export-subtitle">Required for pibooth</h3>
       <p className="hint-small export-description">
-        Ce fichier est le seul dont pibooth a besoin pour afficher vos mises en page.
+        This is the only file pibooth actually needs to render your layouts.
       </p>
       <div className="info-box">
-        Placez <code>picture_template.xml</code> où vous voulez sur le Raspberry Pi, puis indiquez son chemin dans{' '}
-        <code>pibooth.cfg</code> :
+        Place <code>picture_template.xml</code> anywhere on the Raspberry Pi, then point to it from{' '}
+        <code>pibooth.cfg</code>:
         <pre>
           [PICTURE]{'\n'}
-          template = /chemin/vers/picture_template.xml
+          template = /path/to/picture_template.xml
         </pre>
       </div>
       <button className="primary" onClick={download} disabled={layoutsCount === 0}>
-        Télécharger picture_template.xml
+        Download picture_template.xml
       </button>
       <button className="secondary" onClick={copy} disabled={layoutsCount === 0}>
-        {copied ? 'Copié !' : 'Copier le XML'}
+        {copied ? 'Copied!' : 'Copy XML'}
       </button>
 
-      <h3 className="export-subtitle">Optionnel</h3>
-      <p className="hint-small">Sauvegarde pratique (images + projet réimportable) — pibooth n'en a pas besoin.</p>
+      <h3 className="export-subtitle">Optional</h3>
+      <p className="hint-small">
+        Handy backup (images + a reimportable project) — useful if you want to share your work with someone else.
+      </p>
       <button className="secondary" onClick={downloadZip} disabled={layoutsCount === 0 || zipping}>
-        {zipping ? 'Préparation…' : `Dossier complet (.zip, ${imagesCount} image(s))`}
+        {zipping ? 'Preparing…' : `Full folder (.zip, ${imagesCount} image(s))`}
       </button>
     </section>
   );

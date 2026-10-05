@@ -115,12 +115,12 @@ export function parseTemplateXml(xmlText: string): ImportResult {
   const warnings: string[] = [];
   const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
   if (doc.querySelector('parsererror')) {
-    throw new TemplateImportError('Le fichier XML est invalide ou corrompu.');
+    throw new TemplateImportError('The XML file is invalid or corrupted.');
   }
 
   const diagramEls = Array.from(doc.getElementsByTagName('diagram'));
   if (diagramEls.length === 0) {
-    throw new TemplateImportError('Aucune page <diagram> trouvée dans ce fichier.');
+    throw new TemplateImportError('No <diagram> page found in this file.');
   }
 
   const layouts = createEmptyLayouts();
@@ -141,19 +141,19 @@ export function parseTemplateXml(xmlText: string): ImportResult {
         const innerDoc = new DOMParser().parseFromString(inflatedXml, 'application/xml');
         graphModelEl = innerDoc.querySelector('mxGraphModel');
       } catch {
-        warnings.push(`Page "${pageName}" : impossible de décompresser le contenu (ignorée).`);
+        warnings.push(`Page "${pageName}": could not decompress its content (skipped).`);
         return;
       }
     }
     if (!graphModelEl) {
-      warnings.push(`Page "${pageName}" : aucun contenu exploitable (ignorée).`);
+      warnings.push(`Page "${pageName}": no usable content (skipped).`);
       return;
     }
 
     const pageWidthCin = Number(graphModelEl.getAttribute('pageWidth') || '0');
     const pageHeightCin = Number(graphModelEl.getAttribute('pageHeight') || '0');
     if (!pageWidthCin || !pageHeightCin) {
-      warnings.push(`Page "${pageName}" : taille de page manquante (ignorée).`);
+      warnings.push(`Page "${pageName}": missing page size (skipped).`);
       return;
     }
     const widthIn = pageWidthCin / 100;
@@ -197,7 +197,7 @@ export function parseTemplateXml(xmlText: string): ImportResult {
             rotationDeg: parsed.rotationDeg,
           });
         } else if (parsed.text) {
-          warnings.push(`Page "${pageName}" : zone photo avec le texte "${parsed.text}" ignorée (doit être 1 à 4).`);
+          warnings.push(`Page "${pageName}": photo zone with text "${parsed.text}" skipped (must be 1 to 4).`);
         }
       } else if (parsed.kind === 'text') {
         if (['1', '2', 'footer_text1', 'footer_text2'].includes(parsed.text)) {
@@ -212,7 +212,7 @@ export function parseTemplateXml(xmlText: string): ImportResult {
             rotationDeg: parsed.rotationDeg,
           });
         } else if (parsed.text) {
-          warnings.push(`Page "${pageName}" : zone de texte "${parsed.text}" ignorée (non reconnue par pibooth).`);
+          warnings.push(`Page "${pageName}": text zone "${parsed.text}" skipped (not recognized by pibooth).`);
         }
       } else if (parsed.kind === 'image') {
         if (parsed.image) {
@@ -220,7 +220,7 @@ export function parseTemplateXml(xmlText: string): ImportResult {
             id: genId('image'),
             kind: 'image',
             dataUrl: styleImageToDataUrl(parsed.image),
-            label: 'Image importée',
+            label: 'Imported image',
             xIn: parsed.xIn,
             yIn: parsed.yIn,
             wIn: parsed.wIn,
@@ -233,18 +233,18 @@ export function parseTemplateXml(xmlText: string): ImportResult {
 
     const count = captureNumbers.size;
     if (count < 1 || count > 4) {
-      warnings.push(`Page "${pageName}" : ${count} zone(s) photo distincte(s), ignorée (doit être comprise entre 1 et 4).`);
+      warnings.push(`Page "${pageName}": ${count} distinct photo zone(s), skipped (must be between 1 and 4).`);
       return;
     }
     const key = layoutKey(count as CaptureCount, orientation);
     if (layouts[key].layers.length > 0) {
-      warnings.push(`Page "${pageName}" : une autre page définissait déjà ${count} photo(s) / ${orientation}, celle-ci l'a remplacée.`);
+      warnings.push(`Page "${pageName}": another page already defined ${count} photo(s) / ${orientation}, this one replaced it.`);
     }
     layouts[key] = { enabled: true, layers };
   });
 
   const project: Project = {
-    name: 'Template importé',
+    name: 'Imported template',
     dpi,
     pageSizeId: closestPresetId(round2(shortIn), round2(longIn)),
     customShortIn: round2(shortIn),
