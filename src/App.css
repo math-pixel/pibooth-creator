@@ -66,11 +66,15 @@
   display: grid;
   grid-template-columns: 300px 1fr 320px;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .sidebar,
 .right-panel {
   overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
   padding: 16px;
   background: #111827;
   display: flex;
@@ -88,6 +92,7 @@
 
 .app-main {
   overflow: auto;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -227,6 +232,9 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 7px 2px;
 }
 
 .text-buttons {
