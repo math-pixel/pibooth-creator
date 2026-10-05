@@ -95,6 +95,11 @@ section h2 {
   margin: 0;
 }
 
+.link-row {
+  display: flex;
+  gap: 12px;
+}
+
 .link-button {
   width: auto;
   background: transparent;

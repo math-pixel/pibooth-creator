@@ -3,6 +3,7 @@ import type { CaptureCount, Orientation, Project } from '../types';
 import { PAGE_SIZE_PRESETS, layoutKey } from '../types';
 import { useStore, getActiveLayout } from '../store';
 import { readFileAsDataUrl } from '../utils';
+import { importProjectFromFile } from '../projectIO';
 
 const COUNTS: CaptureCount[] = [1, 2, 3, 4];
 
@@ -39,14 +40,38 @@ export default function Sidebar() {
   const addCaptureLayer = useStore((s) => s.addCaptureLayer);
   const addTextLayer = useStore((s) => s.addTextLayer);
   const resetProject = useStore((s) => s.resetProject);
+  const loadProject = useStore((s) => s.loadProject);
+  const pushToast = useStore((s) => s.pushToast);
 
   const bgInputRef = useRef<HTMLInputElement>(null);
   const fgInputRef = useRef<HTMLInputElement>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   async function handleUpload(file: File | null | undefined, position: 'background' | 'foreground') {
     if (!file) return;
     const dataUrl = await readFileAsDataUrl(file);
     addImageLayer(dataUrl, file.name, position);
+  }
+
+  async function handleImport(file: File | null | undefined) {
+    if (!file) return;
+    try {
+      const { project: imported, warnings, source } = await importProjectFromFile(file);
+      if (
+        warnings.length === 0 ||
+        window.confirm(
+          `${warnings.length} page(s) ignorée(s) ou ajustée(s) pendant l'import :\n\n${warnings.join('\n')}\n\nContinuer quand même ?`
+        )
+      ) {
+        loadProject(imported);
+        pushToast(
+          source === 'project-json' ? 'Projet importé (état complet restauré)' : 'Template XML importé et reconstruit',
+          'success'
+        );
+      }
+    } catch (err) {
+      pushToast(err instanceof Error ? err.message : "Échec de l'import.", 'warning');
+    }
   }
 
   const portraitLayout = useStore((s) => s.project.layouts[`${activeCount}_portrait`]);
@@ -59,17 +84,36 @@ export default function Sidebar() {
       <section>
         <div className="section-header-row">
           <h2>Projet</h2>
-          <button
-            className="link-button"
-            onClick={() => {
-              if (window.confirm('Repartir sur un nouveau projet ? Le travail en cours sera perdu.')) {
-                resetProject();
-              }
+          <div className="link-row">
+            <button className="link-button" onClick={() => importInputRef.current?.click()}>
+              Importer
+            </button>
+            <button
+              className="link-button"
+              onClick={() => {
+                if (window.confirm('Repartir sur un nouveau projet ? Le travail en cours sera perdu.')) {
+                  resetProject();
+                }
+              }}
+            >
+              Nouveau projet
+            </button>
+          </div>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".xml,.zip,.json,application/xml,application/zip,application/json"
+            hidden
+            onChange={(e) => {
+              handleImport(e.target.files?.[0]);
+              e.target.value = '';
             }}
-          >
-            Nouveau projet
-          </button>
+          />
         </div>
+        <p className="hint-small">
+          Importez un <code>picture_template.xml</code> existant (même fait à la main sous draw.io) ou un projet .zip
+          exporté depuis cette application.
+        </p>
         <label>
           Nom du template
           <input value={project.name} onChange={(e) => setProjectName(e.target.value)} />
@@ -196,6 +240,11 @@ export default function Sidebar() {
             + Texte pied 2
           </button>
         </div>
+        <p className="hint-small">
+          Ces zones ne définissent que l'<strong>emplacement</strong> du texte. Le contenu affiché (la date, un
+          message…) est choisi dans <code>pibooth.cfg</code> (<code>[PICTURE] footer_text1</code> /{' '}
+          <code>footer_text2</code>), pas ici — on ne peut pas mettre de texte libre dans le XML.
+        </p>
       </section>
     </aside>
   );

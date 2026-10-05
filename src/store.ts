@@ -10,20 +10,7 @@ import type {
   TextLayer,
 } from './types';
 import { layoutKey } from './types';
-import { genId, getPageSizeIn } from './utils';
-
-function emptyLayouts(): Project['layouts'] {
-  const layouts = {} as Project['layouts'];
-  ([1, 2, 3, 4] as CaptureCount[]).forEach((count) => {
-    (['portrait', 'landscape'] as Orientation[]).forEach((orientation) => {
-      layouts[layoutKey(count, orientation)] = {
-        enabled: orientation === 'portrait',
-        layers: [],
-      };
-    });
-  });
-  return layouts;
-}
+import { createEmptyLayouts, genId, getPageSizeIn } from './utils';
 
 function defaultProject(): Project {
   return {
@@ -32,7 +19,7 @@ function defaultProject(): Project {
     pageSizeId: '4x6',
     customShortIn: 4,
     customLongIn: 6,
-    layouts: emptyLayouts(),
+    layouts: createEmptyLayouts(),
   };
 }
 

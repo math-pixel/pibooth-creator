@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useStore, getActiveLayout } from '../store';
 import type { Layer } from '../types';
 import { buildTemplateXml, countEnabledLayouts, validateProject } from '../xmlExport';
+import { buildProjectZip, countEmbeddedImages } from '../projectIO';
 import { round2 } from '../utils';
 
 function layerLabel(layer: Layer): string {
@@ -132,26 +133,37 @@ function PropertiesPanel() {
           </select>
         </label>
       )}
+      {layer.kind === 'text' && (
+        <p className="hint-small">
+          Emplacement uniquement : le texte affiché vient de <code>pibooth.cfg</code> (
+          <code>{layer.key.startsWith('footer') ? layer.key : `footer_text${layer.key}`}</code>), pas du XML.
+        </p>
+      )}
     </section>
   );
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function ExportPanel() {
   const project = useStore((s) => s.project);
   const pushToast = useStore((s) => s.pushToast);
   const [copied, setCopied] = useState(false);
+  const [zipping, setZipping] = useState(false);
   const warnings = useMemo(() => validateProject(project), [project]);
   const layoutsCount = countEnabledLayouts(project);
+  const imagesCount = countEmbeddedImages(project);
 
   function download() {
     const xml = buildTemplateXml(project);
-    const blob = new Blob([xml], { type: 'application/xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'picture_template.xml';
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(new Blob([xml], { type: 'application/xml' }), 'picture_template.xml');
     pushToast('picture_template.xml téléchargé', 'success');
   }
 
@@ -161,6 +173,17 @@ function ExportPanel() {
     setCopied(true);
     pushToast('XML copié dans le presse-papiers', 'success');
     setTimeout(() => setCopied(false), 1500);
+  }
+
+  async function downloadZip() {
+    setZipping(true);
+    try {
+      const blob = await buildProjectZip(project);
+      downloadBlob(blob, `${project.name.replace(/[^a-z0-9_-]+/gi, '_') || 'pibooth-template'}.zip`);
+      pushToast('Dossier projet (.zip) téléchargé', 'success');
+    } finally {
+      setZipping(false);
+    }
   }
 
   return (
@@ -181,8 +204,16 @@ function ExportPanel() {
         {copied ? 'Copié !' : 'Copier le XML'}
       </button>
       <p className="hint-small">
-        Placez le fichier dans votre config pibooth puis renseignez son chemin dans{' '}
+        C'est le seul fichier dont pibooth a besoin — renseignez son chemin dans{' '}
         <code>PICTURE.template</code> de <code>pibooth.cfg</code>.
+      </p>
+      <button className="secondary" onClick={downloadZip} disabled={layoutsCount === 0 || zipping}>
+        {zipping ? 'Préparation…' : `Télécharger le dossier complet (.zip, ${imagesCount} image(s))`}
+      </button>
+      <p className="hint-small">
+        Contient le XML, chaque image source en fichier séparé, et l'état complet du projet pour le réimporter plus
+        tard. Le dossier d'images n'est pas requis par pibooth (les images sont déjà intégrées dans le XML) — c'est
+        une sauvegarde pratique pour vous.
       </p>
     </section>
   );

@@ -1,5 +1,18 @@
-import type { Orientation, Project } from './types';
-import { PAGE_SIZE_PRESETS } from './types';
+import type { CaptureCount, Orientation, Project } from './types';
+import { PAGE_SIZE_PRESETS, layoutKey } from './types';
+
+export function createEmptyLayouts(): Project['layouts'] {
+  const layouts = {} as Project['layouts'];
+  ([1, 2, 3, 4] as CaptureCount[]).forEach((count) => {
+    (['portrait', 'landscape'] as Orientation[]).forEach((orientation) => {
+      layouts[layoutKey(count, orientation)] = {
+        enabled: orientation === 'portrait',
+        layers: [],
+      };
+    });
+  });
+  return layouts;
+}
 
 export function getPageSizeIn(project: Project, orientation: Orientation): { widthIn: number; heightIn: number } {
   const preset = PAGE_SIZE_PRESETS.find((p) => p.id === project.pageSizeId);
