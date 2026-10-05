@@ -232,7 +232,24 @@ export const useStore = create<EditorState>((set) => ({
       return { project: { ...s.project, layouts } };
     }),
 
-  loadProject: (project) => set({ project, selectedLayerId: null }),
+  loadProject: (project) =>
+    set(() => {
+      let activeCount: CaptureCount = 1;
+      let activeOrientation: Orientation = 'portrait';
+      let found = false;
+      for (const count of [1, 2, 3, 4] as CaptureCount[]) {
+        for (const orientation of ['portrait', 'landscape'] as Orientation[]) {
+          if (project.layouts[layoutKey(count, orientation)]?.layers.length > 0) {
+            activeCount = count;
+            activeOrientation = orientation;
+            found = true;
+            break;
+          }
+        }
+        if (found) break;
+      }
+      return { project, selectedLayerId: null, activeCount, activeOrientation };
+    }),
   resetProject: () => set({ project: defaultProject(), selectedLayerId: null }),
 }));
 

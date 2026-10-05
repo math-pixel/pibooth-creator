@@ -57,6 +57,7 @@ export default function Sidebar() {
     if (!file) return;
     try {
       const { project: imported, warnings, source } = await importProjectFromFile(file);
+      const totalLayers = Object.values(imported.layouts).reduce((sum, l) => sum + l.layers.length, 0);
       if (
         warnings.length === 0 ||
         window.confirm(
@@ -64,10 +65,14 @@ export default function Sidebar() {
         )
       ) {
         loadProject(imported);
-        pushToast(
-          source === 'project-json' ? 'Projet importé (état complet restauré)' : 'Template XML importé et reconstruit',
-          'success'
-        );
+        if (totalLayers === 0) {
+          pushToast("Projet importé, mais il ne contient aucun calque (fichier vide ?)", 'warning');
+        } else {
+          pushToast(
+            source === 'project-json' ? 'Projet importé (état complet restauré)' : 'Template XML importé et reconstruit',
+            'success'
+          );
+        }
       }
     } catch (err) {
       pushToast(err instanceof Error ? err.message : "Échec de l'import.", 'warning');
