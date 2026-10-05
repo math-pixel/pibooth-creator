@@ -1,8 +1,5 @@
-import { useMemo, useState } from 'react';
 import { useStore, getActiveLayout } from '../store';
 import type { Layer } from '../types';
-import { buildTemplateXml, countEnabledLayouts, validateProject } from '../xmlExport';
-import { buildProjectZip, countEmbeddedImages } from '../projectIO';
 import { round2 } from '../utils';
 
 function layerLabel(layer: Layer): string {
@@ -143,88 +140,11 @@ function PropertiesPanel() {
   );
 }
 
-function downloadBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function ExportPanel() {
-  const project = useStore((s) => s.project);
-  const pushToast = useStore((s) => s.pushToast);
-  const [copied, setCopied] = useState(false);
-  const [zipping, setZipping] = useState(false);
-  const warnings = useMemo(() => validateProject(project), [project]);
-  const layoutsCount = countEnabledLayouts(project);
-  const imagesCount = countEmbeddedImages(project);
-
-  function download() {
-    const xml = buildTemplateXml(project);
-    downloadBlob(new Blob([xml], { type: 'application/xml' }), 'picture_template.xml');
-    pushToast('picture_template.xml téléchargé', 'success');
-  }
-
-  async function copy() {
-    const xml = buildTemplateXml(project);
-    await navigator.clipboard.writeText(xml);
-    setCopied(true);
-    pushToast('XML copié dans le presse-papiers', 'success');
-    setTimeout(() => setCopied(false), 1500);
-  }
-
-  async function downloadZip() {
-    setZipping(true);
-    try {
-      const blob = await buildProjectZip(project);
-      downloadBlob(blob, `${project.name.replace(/[^a-z0-9_-]+/gi, '_') || 'pibooth-template'}.zip`);
-      pushToast('Dossier projet (.zip) téléchargé', 'success');
-    } finally {
-      setZipping(false);
-    }
-  }
-
-  return (
-    <section>
-      <h2>Export</h2>
-      <p className="hint-small">{layoutsCount} mise(s) en page prête(s) à être exportée(s).</p>
-      {warnings.length > 0 && (
-        <ul className="warnings">
-          {warnings.map((w) => (
-            <li key={w}>{w}</li>
-          ))}
-        </ul>
-      )}
-      <button className="primary" onClick={download} disabled={layoutsCount === 0}>
-        Télécharger picture_template.xml
-      </button>
-      <button className="secondary" onClick={copy} disabled={layoutsCount === 0}>
-        {copied ? 'Copié !' : 'Copier le XML'}
-      </button>
-      <p className="hint-small">
-        C'est le seul fichier dont pibooth a besoin — renseignez son chemin dans{' '}
-        <code>PICTURE.template</code> de <code>pibooth.cfg</code>.
-      </p>
-      <button className="secondary" onClick={downloadZip} disabled={layoutsCount === 0 || zipping}>
-        {zipping ? 'Préparation…' : `Télécharger le dossier complet (.zip, ${imagesCount} image(s))`}
-      </button>
-      <p className="hint-small">
-        Contient le XML, chaque image source en fichier séparé, et l'état complet du projet pour le réimporter plus
-        tard. Le dossier d'images n'est pas requis par pibooth (les images sont déjà intégrées dans le XML) — c'est
-        une sauvegarde pratique pour vous.
-      </p>
-    </section>
-  );
-}
-
 export default function RightPanel() {
   return (
-    <>
+    <aside className="right-panel">
       <LayersPanel />
       <PropertiesPanel />
-      <ExportPanel />
-    </>
+    </aside>
   );
 }

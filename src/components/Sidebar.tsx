@@ -4,6 +4,7 @@ import { PAGE_SIZE_PRESETS, layoutKey } from '../types';
 import { useStore, getActiveLayout } from '../store';
 import { readFileAsDataUrl } from '../utils';
 import { importProjectFromFile } from '../projectIO';
+import ExportPanel from './ExportPanel';
 
 const COUNTS: CaptureCount[] = [1, 2, 3, 4];
 
@@ -85,7 +86,7 @@ export default function Sidebar() {
     : 0;
 
   return (
-    <>
+    <aside className="sidebar">
       <section>
         <div className="section-header-row">
           <h2>Projet</h2>
@@ -251,6 +252,8 @@ export default function Sidebar() {
           <code>footer_text2</code>), pas ici — on ne peut pas mettre de texte libre dans le XML.
         </p>
       </section>
-    </>
+
+      <ExportPanel />
+    </aside>
   );
 }

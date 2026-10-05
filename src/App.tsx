@@ -60,19 +60,13 @@ export default function App() {
           <p>Créez visuellement vos templates pour le plugin pibooth-picture-template, sans XML ni éditeur de diagramme.</p>
         </div>
         <UndoRedoButtons />
-        <div className="app-header-badge" title="Les images de premier plan (cadres, overlays) sont nativement supportées par le plugin via l'ordre des calques (équivalent de l'option « To Front » de draw.io).">
-          ✓ Premier plan supporté nativement par pibooth
-        </div>
       </header>
       <div className="app-body">
-        <aside className="sidebar">
-          <Sidebar />
-          <hr className="panel-divider" />
-          <RightPanel />
-        </aside>
+        <Sidebar />
         <main className="app-main">
           <CanvasEditor />
         </main>
+        <RightPanel />
       </div>
       <Toaster />
     </div>
