@@ -59,14 +59,23 @@ interface EditorState {
 
   loadProject: (project: Project) => void;
   resetProject: () => void;
+
+  past: Project[];
+  future: Project[];
+  undo: () => void;
+  redo: () => void;
 }
 
-export const useStore = create<EditorState>((set) => ({
+const MAX_HISTORY = 100;
+
+export const useStore = create<EditorState>((set, get) => ({
   project: defaultProject(),
   activeCount: 1,
   activeOrientation: 'portrait',
   selectedLayerId: null,
   toasts: [],
+  past: [],
+  future: [],
 
   pushToast: (message, tone = 'info') =>
     set((s) => ({ toasts: [...s.toasts, { id: genId('toast'), message, tone }] })),
@@ -251,8 +260,51 @@ export const useStore = create<EditorState>((set) => ({
       return { project, selectedLayerId: null, activeCount, activeOrientation };
     }),
   resetProject: () => set({ project: defaultProject(), selectedLayerId: null }),
+
+  undo: () => {
+    flushHistoryBurst();
+    const { past, future, project } = get();
+    if (past.length === 0) return;
+    const previous = past[past.length - 1];
+    isTimeTraveling = true;
+    set({ project: previous, past: past.slice(0, -1), future: [project, ...future], selectedLayerId: null });
+    isTimeTraveling = false;
+  },
+  redo: () => {
+    flushHistoryBurst();
+    const { past, future, project } = get();
+    if (future.length === 0) return;
+    const next = future[0];
+    isTimeTraveling = true;
+    set({ project: next, past: [...past, project], future: future.slice(1), selectedLayerId: null });
+    isTimeTraveling = false;
+  },
 }));
 
 export function getActiveLayout(state: EditorState) {
   return state.project.layouts[layoutKey(state.activeCount, state.activeOrientation)];
 }
+
+// --- Undo/redo history tracking ---------------------------------------
+// Rapid-fire changes (typing in a number field, dragging) are coalesced into
+// a single history entry by waiting for a short pause before committing.
+let isTimeTraveling = false;
+let burstStartProject: Project | null = null;
+let burstTimer: ReturnType<typeof setTimeout> | null = null;
+
+function flushHistoryBurst() {
+  if (burstTimer) clearTimeout(burstTimer);
+  burstTimer = null;
+  if (burstStartProject) {
+    const captured = burstStartProject;
+    burstStartProject = null;
+    useStore.setState((s) => ({ past: [...s.past, captured].slice(-MAX_HISTORY), future: [] }));
+  }
+}
+
+useStore.subscribe((state, prevState) => {
+  if (isTimeTraveling || state.project === prevState.project) return;
+  if (burstStartProject === null) burstStartProject = prevState.project;
+  if (burstTimer) clearTimeout(burstTimer);
+  burstTimer = setTimeout(flushHistoryBurst, 500);
+});
