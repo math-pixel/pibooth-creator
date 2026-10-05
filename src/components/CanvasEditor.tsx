@@ -66,7 +66,7 @@ function ImageShape({
           rotationDeg: node.rotation(),
         });
       }}
-      stroke={isSelected ? '#2563eb' : undefined}
+      stroke={isSelected ? '#1f1f1f' : undefined}
       strokeWidth={isSelected ? 2 : 0}
     />
   );
@@ -94,7 +94,7 @@ function RectShape({
         height={layer.hIn * scale}
         rotation={layer.rotationDeg}
         fill={fill}
-        stroke={isSelected ? '#2563eb' : '#334155'}
+        stroke={isSelected ? '#1f1f1f' : '#c9c9cd'}
         strokeWidth={isSelected ? 2 : 1}
         cornerRadius={4}
         draggable
@@ -257,24 +257,24 @@ export default function CanvasEditor() {
                 return <ImageShape key={layer.id} layer={layer} {...common} />;
               }
               if (layer.kind === 'capture') {
-                return <RectShape key={layer.id} layer={layer} {...common} label={`Photo ${layer.number}`} fill="rgba(15, 23, 42, 0.78)" />;
+                return <RectShape key={layer.id} layer={layer} {...common} label={`Photo ${layer.number}`} fill="rgba(31, 31, 31, 0.78)" />;
               }
-              return <RectShape key={layer.id} layer={layer} {...common} label={layer.key} fill="rgba(37, 99, 235, 0.55)" />;
+              return <RectShape key={layer.id} layer={layer} {...common} label={layer.key} fill="rgba(31, 31, 31, 0.45)" />;
             })}
-            <Rect x={0} y={0} width={pageWidthPx} height={pageHeightPx} stroke="#94a3b8" listening={false} />
+            <Rect x={0} y={0} width={pageWidthPx} height={pageHeightPx} stroke="#c9c9cd" listening={false} />
             {guides.map((g, i) =>
               g.orientation === 'vertical' ? (
-                <Line key={i} points={[g.posPx, -20, g.posPx, pageHeightPx + 20]} stroke="#f472b6" strokeWidth={1} dash={[4, 4]} listening={false} />
+                <Line key={i} points={[g.posPx, -20, g.posPx, pageHeightPx + 20]} stroke="#1227fd" strokeWidth={1} dash={[4, 4]} listening={false} />
               ) : (
-                <Line key={i} points={[-20, g.posPx, pageWidthPx + 20, g.posPx]} stroke="#f472b6" strokeWidth={1} dash={[4, 4]} listening={false} />
+                <Line key={i} points={[-20, g.posPx, pageWidthPx + 20, g.posPx]} stroke="#1227fd" strokeWidth={1} dash={[4, 4]} listening={false} />
               )
             )}
             <Transformer
               ref={transformerRef}
               rotateEnabled
               anchorSize={9}
-              borderStroke="#2563eb"
-              anchorStroke="#2563eb"
+              borderStroke="#1f1f1f"
+              anchorStroke="#1f1f1f"
               anchorFill="#ffffff"
               boundBoxFunc={(oldBox, newBox) => {
                 if (newBox.width < 10 || newBox.height < 10) return oldBox;

@@ -197,7 +197,7 @@ function ExportPanel() {
           ))}
         </ul>
       )}
-      <button onClick={download} disabled={layoutsCount === 0}>
+      <button className="primary" onClick={download} disabled={layoutsCount === 0}>
         Télécharger picture_template.xml
       </button>
       <button className="secondary" onClick={copy} disabled={layoutsCount === 0}>
@@ -221,10 +221,10 @@ function ExportPanel() {
 
 export default function RightPanel() {
   return (
-    <aside className="right-panel">
+    <>
       <LayersPanel />
       <PropertiesPanel />
       <ExportPanel />
-    </aside>
+    </>
   );
 }

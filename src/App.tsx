@@ -65,11 +65,14 @@ export default function App() {
         </div>
       </header>
       <div className="app-body">
-        <Sidebar />
+        <aside className="sidebar">
+          <Sidebar />
+          <hr className="panel-divider" />
+          <RightPanel />
+        </aside>
         <main className="app-main">
           <CanvasEditor />
         </main>
-        <RightPanel />
       </div>
       <Toaster />
     </div>

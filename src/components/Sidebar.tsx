@@ -85,7 +85,7 @@ export default function Sidebar() {
     : 0;
 
   return (
-    <aside className="sidebar">
+    <>
       <section>
         <div className="section-header-row">
           <h2>Projet</h2>
@@ -218,7 +218,7 @@ export default function Sidebar() {
 
       <section>
         <h2>Ajouter des éléments</h2>
-        <button onClick={() => bgInputRef.current?.click()}>+ Image de fond</button>
+        <button className="primary" onClick={() => bgInputRef.current?.click()}>+ Image de fond</button>
         <input
           ref={bgInputRef}
           type="file"
@@ -226,10 +226,10 @@ export default function Sidebar() {
           hidden
           onChange={(e) => handleUpload(e.target.files?.[0], 'background')}
         />
-        <button onClick={addCaptureLayer} disabled={captureNumbersUsed >= activeCount}>
+        <button className="primary" onClick={addCaptureLayer} disabled={captureNumbersUsed >= activeCount}>
           + Zone photo
         </button>
-        <button onClick={() => fgInputRef.current?.click()}>+ Image de premier plan</button>
+        <button className="primary" onClick={() => fgInputRef.current?.click()}>+ Image de premier plan</button>
         <input
           ref={fgInputRef}
           type="file"
@@ -251,6 +251,6 @@ export default function Sidebar() {
           <code>footer_text2</code>), pas ici — on ne peut pas mettre de texte libre dans le XML.
         </p>
       </section>
-    </aside>
+    </>
   );
 }
