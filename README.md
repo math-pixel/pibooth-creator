@@ -4,7 +4,8 @@ A visual, drag-and-drop editor for building templates compatible with the
 [pibooth-picture-template](https://github.com/pibooth/pibooth-picture-template) plugin — no draw.io,
 no XML, no diagram editor required.
 
-![Editor overview](docs/screenshots/01-overview.png)
+<img width="1906" height="1022" alt="image" src="https://github.com/user-attachments/assets/6bdac842-e828-4931-8070-da2da3c52815" />
+
 
 ## Why
 
@@ -34,17 +35,16 @@ and export a `picture_template.xml` that drops straight into your `pibooth.cfg`.
 
 ## Screenshots
 
-**Dragging a photo zone, snapped to the page center**
-![Dragging a photo zone with snap guides](docs/screenshots/02-snap-guides.png)
-
 **Reordering background/foreground layers**
-![Layers panel](docs/screenshots/03-layers.png)
+<img width="347" height="357" alt="image" src="https://github.com/user-attachments/assets/4d314505-b7e8-4c32-aa22-ed949454846d" />
+
 
 **Exporting the finished template**
-![Export panel](docs/screenshots/04-export.png)
+<img width="367" height="660" alt="image" src="https://github.com/user-attachments/assets/4d7791a3-b964-4705-8e91-9fa00c2b254d" />
 
 **Importing an existing `.xml` template**
-![Importing a template](docs/screenshots/05-import.png)
+<img width="382" height="542" alt="image" src="https://github.com/user-attachments/assets/4f196d38-6d7b-45d7-96cb-4b8161430fb9" />
+
 
 ## Getting started
 
