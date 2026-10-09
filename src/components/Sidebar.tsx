@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import type { CaptureCount, Orientation, Project } from '../types';
 import { PAGE_SIZE_PRESETS, layoutKey } from '../types';
-import { useStore, getActiveLayout } from '../store';
+import { useStore, getActiveLayout, getActiveOrientation } from '../store';
 import { readFileAsDataUrl } from '../utils';
 import { importProjectFromFile } from '../projectIO';
 
@@ -25,7 +25,7 @@ function tabStatus(project: Project, count: CaptureCount): TabStatus {
 export default function Sidebar() {
   const project = useStore((s) => s.project);
   const activeCount = useStore((s) => s.activeCount);
-  const activeOrientation = useStore((s) => s.activeOrientation);
+  const activeOrientation = useStore(getActiveOrientation);
   const layout = useStore(getActiveLayout);
 
   const setProjectName = useStore((s) => s.setProjectName);

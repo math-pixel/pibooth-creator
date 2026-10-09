@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Stage, Layer as KonvaLayer, Rect, Image as KonvaImage, Transformer, Text, Group, Line } from 'react-konva';
 import useImage from 'use-image';
 import type Konva from 'konva';
-import { useStore, getActiveLayout } from '../store';
+import { useStore, getActiveLayout, getActiveOrientation } from '../store';
 import type { Layer } from '../types';
 import { getPageSizeIn } from '../utils';
 import { computeSnap } from '../snapping';
@@ -146,7 +146,7 @@ function RectShape({
 
 export default function CanvasEditor() {
   const project = useStore((s) => s.project);
-  const activeOrientation = useStore((s) => s.activeOrientation);
+  const activeOrientation = useStore(getActiveOrientation);
   const layout = useStore(getActiveLayout);
   const selectedLayerId = useStore((s) => s.selectedLayerId);
   const selectLayer = useStore((s) => s.selectLayer);

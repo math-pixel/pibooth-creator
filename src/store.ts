@@ -29,10 +29,14 @@ export interface Toast {
   tone: 'info' | 'success' | 'warning';
 }
 
+type OrientationByCount = Record<CaptureCount, Orientation>;
+
 interface EditorState {
   project: Project;
   activeCount: CaptureCount;
-  activeOrientation: Orientation;
+  /** Which orientation tab is active, remembered independently per photo count
+   * (e.g. "1 photo" can stay on portrait while "4 photos" stays on landscape). */
+  orientationByCount: OrientationByCount;
   selectedLayerId: string | null;
   toasts: Toast[];
   pushToast: (message: string, tone?: Toast['tone']) => void;
@@ -68,10 +72,14 @@ interface EditorState {
 
 const MAX_HISTORY = 100;
 
+function defaultOrientationByCount(): OrientationByCount {
+  return { 1: 'portrait', 2: 'portrait', 3: 'portrait', 4: 'portrait' };
+}
+
 export const useStore = create<EditorState>((set, get) => ({
   project: defaultProject(),
   activeCount: 1,
-  activeOrientation: 'portrait',
+  orientationByCount: defaultOrientationByCount(),
   selectedLayerId: null,
   toasts: [],
   past: [],
@@ -82,7 +90,11 @@ export const useStore = create<EditorState>((set, get) => ({
   dismissToast: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
 
   setActiveCount: (count) => set({ activeCount: count, selectedLayerId: null }),
-  setActiveOrientation: (orientation) => set({ activeOrientation: orientation, selectedLayerId: null }),
+  setActiveOrientation: (orientation) =>
+    set((s) => ({
+      orientationByCount: { ...s.orientationByCount, [s.activeCount]: orientation },
+      selectedLayerId: null,
+    })),
   selectLayer: (id) => set({ selectedLayerId: id }),
 
   setProjectName: (name) => set((s) => ({ project: { ...s.project, name } })),
@@ -93,7 +105,7 @@ export const useStore = create<EditorState>((set, get) => ({
 
   setLayoutEnabled: (enabled) =>
     set((s) => {
-      const key = layoutKey(s.activeCount, s.activeOrientation);
+      const key = layoutKey(s.activeCount, s.orientationByCount[s.activeCount]);
       const layouts = { ...s.project.layouts };
       layouts[key] = { ...layouts[key], enabled };
       return { project: { ...s.project, layouts } };
@@ -118,7 +130,7 @@ export const useStore = create<EditorState>((set, get) => ({
       layouts[dstKey] = { enabled: true, layers };
       return {
         project: { ...s.project, layouts },
-        activeOrientation: 'landscape' as Orientation,
+        orientationByCount: { ...s.orientationByCount, [s.activeCount]: 'landscape' as Orientation },
         toasts: [
           ...s.toasts,
           { id: genId('toast'), message: 'Landscape layout generated from portrait', tone: 'success' as const },
@@ -128,8 +140,9 @@ export const useStore = create<EditorState>((set, get) => ({
 
   addImageLayer: (dataUrl, label, position) =>
     set((s) => {
-      const key = layoutKey(s.activeCount, s.activeOrientation);
-      const size = getPageSizeIn(s.project, s.activeOrientation);
+      const orientation = s.orientationByCount[s.activeCount];
+      const key = layoutKey(s.activeCount, orientation);
+      const size = getPageSizeIn(s.project, orientation);
       const layer: ImageLayer = {
         id: genId('image'),
         kind: 'image',
@@ -156,9 +169,10 @@ export const useStore = create<EditorState>((set, get) => ({
 
   addCaptureLayer: () =>
     set((s) => {
-      const key = layoutKey(s.activeCount, s.activeOrientation);
+      const orientation = s.orientationByCount[s.activeCount];
+      const key = layoutKey(s.activeCount, orientation);
       const layout = s.project.layouts[key];
-      const size = getPageSizeIn(s.project, s.activeOrientation);
+      const size = getPageSizeIn(s.project, orientation);
       const existingNumbers = new Set(
         layout.layers.filter((l): l is CaptureLayer => l.kind === 'capture').map((l) => l.number)
       );
@@ -188,9 +202,10 @@ export const useStore = create<EditorState>((set, get) => ({
 
   addTextLayer: (key: TextKey) =>
     set((s) => {
-      const lk = layoutKey(s.activeCount, s.activeOrientation);
+      const orientation = s.orientationByCount[s.activeCount];
+      const lk = layoutKey(s.activeCount, orientation);
       const layout = s.project.layouts[lk];
-      const size = getPageSizeIn(s.project, s.activeOrientation);
+      const size = getPageSizeIn(s.project, orientation);
       const layer: TextLayer = {
         id: genId('text'),
         kind: 'text',
@@ -208,7 +223,7 @@ export const useStore = create<EditorState>((set, get) => ({
 
   updateLayer: (id, patch) =>
     set((s) => {
-      const key = layoutKey(s.activeCount, s.activeOrientation);
+      const key = layoutKey(s.activeCount, s.orientationByCount[s.activeCount]);
       const layout = s.project.layouts[key];
       const layers = layout.layers.map((l) => (l.id === id ? ({ ...l, ...patch } as Layer) : l));
       const layouts = { ...s.project.layouts, [key]: { ...layout, layers } };
@@ -217,7 +232,7 @@ export const useStore = create<EditorState>((set, get) => ({
 
   removeLayer: (id) =>
     set((s) => {
-      const key = layoutKey(s.activeCount, s.activeOrientation);
+      const key = layoutKey(s.activeCount, s.orientationByCount[s.activeCount]);
       const layout = s.project.layouts[key];
       const layers = layout.layers.filter((l) => l.id !== id);
       const layouts = { ...s.project.layouts, [key]: { ...layout, layers } };
@@ -229,7 +244,7 @@ export const useStore = create<EditorState>((set, get) => ({
 
   moveLayer: (id, direction) =>
     set((s) => {
-      const key = layoutKey(s.activeCount, s.activeOrientation);
+      const key = layoutKey(s.activeCount, s.orientationByCount[s.activeCount]);
       const layout = s.project.layouts[key];
       const idx = layout.layers.findIndex((l) => l.id === id);
       if (idx === -1) return s;
@@ -242,24 +257,33 @@ export const useStore = create<EditorState>((set, get) => ({
     }),
 
   loadProject: (project) =>
-    set(() => {
+    set((s) => {
       let activeCount: CaptureCount = 1;
-      let activeOrientation: Orientation = 'portrait';
+      let foundOrientation: Orientation = 'portrait';
       let found = false;
       for (const count of [1, 2, 3, 4] as CaptureCount[]) {
         for (const orientation of ['portrait', 'landscape'] as Orientation[]) {
           if (project.layouts[layoutKey(count, orientation)]?.layers.length > 0) {
             activeCount = count;
-            activeOrientation = orientation;
+            foundOrientation = orientation;
             found = true;
             break;
           }
         }
         if (found) break;
       }
-      return { project, selectedLayerId: null, activeCount, activeOrientation };
+      // Remember each count's own orientation based on what the imported project actually has,
+      // instead of forcing every tab back to portrait.
+      const orientationByCount = { ...s.orientationByCount };
+      ([1, 2, 3, 4] as CaptureCount[]).forEach((count) => {
+        if (project.layouts[layoutKey(count, 'landscape')]?.layers.length > 0 && !(project.layouts[layoutKey(count, 'portrait')]?.layers.length > 0)) {
+          orientationByCount[count] = 'landscape';
+        }
+      });
+      orientationByCount[activeCount] = foundOrientation;
+      return { project, selectedLayerId: null, activeCount, orientationByCount };
     }),
-  resetProject: () => set({ project: defaultProject(), selectedLayerId: null }),
+  resetProject: () => set({ project: defaultProject(), selectedLayerId: null, orientationByCount: defaultOrientationByCount() }),
 
   undo: () => {
     flushHistoryBurst();
@@ -281,8 +305,12 @@ export const useStore = create<EditorState>((set, get) => ({
   },
 }));
 
+export function getActiveOrientation(state: EditorState): Orientation {
+  return state.orientationByCount[state.activeCount];
+}
+
 export function getActiveLayout(state: EditorState) {
-  return state.project.layouts[layoutKey(state.activeCount, state.activeOrientation)];
+  return state.project.layouts[layoutKey(state.activeCount, getActiveOrientation(state))];
 }
 
 // --- Undo/redo history tracking ---------------------------------------
