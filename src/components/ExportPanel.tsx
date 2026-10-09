@@ -20,6 +20,7 @@ export default function ExportPanel() {
   const warnings = useMemo(() => validateProject(project), [project]);
   const layoutsCount = countEnabledLayouts(project);
   const imagesCount = countEmbeddedImages(project);
+  const canExport = layoutsCount > 0 && warnings.length === 0;
 
   function download() {
     const xml = buildTemplateXml(project);
@@ -49,13 +50,19 @@ export default function ExportPanel() {
   return (
     <section>
       <h2>Export</h2>
-      <p className="hint-small">{layoutsCount} layout(s) ready to export.</p>
-      {warnings.length > 0 && (
-        <ul className="warnings">
-          {warnings.map((w) => (
-            <li key={w}>{w}</li>
-          ))}
-        </ul>
+      {warnings.length > 0 ? (
+        <>
+          <p className="hint-small export-blocked">
+            Export is disabled until these are fixed — the generated file would be unsafe to use:
+          </p>
+          <ul className="warnings">
+            {warnings.map((w) => (
+              <li key={w}>{w}</li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p className="hint-small">{layoutsCount} layout(s) ready to export.</p>
       )}
 
       <h3 className="export-subtitle">Required for pibooth</h3>
@@ -70,10 +77,10 @@ export default function ExportPanel() {
           template = /path/to/picture_template.xml
         </pre>
       </div>
-      <button className="primary" onClick={download} disabled={layoutsCount === 0}>
+      <button className="primary" onClick={download} disabled={!canExport}>
         Download picture_template.xml
       </button>
-      <button className="secondary" onClick={copy} disabled={layoutsCount === 0}>
+      <button className="secondary" onClick={copy} disabled={!canExport}>
         {copied ? 'Copied!' : 'Copy XML'}
       </button>
 
@@ -81,7 +88,7 @@ export default function ExportPanel() {
       <p className="hint-small">
         Handy backup (images + a reimportable project) — useful if you want to share your work with someone else.
       </p>
-      <button className="secondary" onClick={downloadZip} disabled={layoutsCount === 0 || zipping}>
+      <button className="secondary" onClick={downloadZip} disabled={!canExport || zipping}>
         {zipping ? 'Preparing…' : `Full folder (.zip, ${imagesCount} image(s))`}
       </button>
     </section>

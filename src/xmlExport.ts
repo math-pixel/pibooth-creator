@@ -114,12 +114,16 @@ export function validateProject(project: Project): string[] {
       const captures = layout.layers.filter((l): l is CaptureLayer => l.kind === 'capture');
       const numbers = new Set(captures.map((c) => c.number));
       if (captures.length === 0) {
-        warnings.push(`${count} photo(s) / ${orientation}: no photo zone defined.`);
+        warnings.push(
+          `${count} photo(s) / ${orientation} is enabled but has no photo zone yet. pibooth will crash if a ` +
+            `session ever takes ${count} photo(s) in ${orientation}: finish this layout, or uncheck "Include this ` +
+            `layout in the export" for it.`
+        );
       } else if (numbers.size !== count) {
         warnings.push(
-          `${count} photo(s) / ${orientation}: needs exactly the numbers 1 to ${count} (found: ${[...numbers]
-            .sort()
-            .join(', ') || 'none'}).`
+          `${count} photo(s) / ${orientation} needs exactly the photo numbers 1 to ${count}, one each (found: ${
+            [...numbers].sort().join(', ') || 'none'
+          }). pibooth will crash on a ${count}-photo session in ${orientation} until this is fixed.`
         );
       }
     });

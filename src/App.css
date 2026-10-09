@@ -436,6 +436,11 @@ button:disabled {
   background: var(--color-ash-grey);
 }
 
+.export-blocked {
+  color: var(--color-warning);
+  font-weight: 600;
+}
+
 .warnings {
   background: var(--color-warning-bg);
   border: 1px solid var(--color-warning-border);
