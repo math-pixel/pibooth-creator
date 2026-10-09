@@ -30,7 +30,6 @@ export interface TextLayer extends BaseLayer {
 export type Layer = ImageLayer | CaptureLayer | TextLayer;
 
 export interface Layout {
-  enabled: boolean;
   layers: Layer[];
 }
 

@@ -160,12 +160,6 @@ label {
   margin-bottom: 12px;
 }
 
-.checkbox-row {
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-}
-
 input,
 select {
   font-family: var(--font-ui);

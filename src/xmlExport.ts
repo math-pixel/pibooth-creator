@@ -84,7 +84,7 @@ export function buildTemplateXml(project: Project): string {
     const count = Number(countStr) as CaptureCount;
     (['portrait', 'landscape'] as Orientation[]).forEach((orientation) => {
       const layout = project.layouts[layoutKey(count, orientation)];
-      if (!layout || !layout.enabled || layout.layers.length === 0) return;
+      if (!layout || layout.layers.length === 0) return;
       diagrams.push(
         buildDiagram(`Page-${pageNumber}`, genId('diagram'), project, orientation, layout.layers)
       );
@@ -99,8 +99,8 @@ ${diagrams.join('\n')}
 `;
 }
 
-export function countEnabledLayouts(project: Project): number {
-  return Object.values(project.layouts).filter((l) => l.enabled && l.layers.length > 0).length;
+export function countReadyLayouts(project: Project): number {
+  return Object.values(project.layouts).filter((l) => l.layers.length > 0).length;
 }
 
 export function validateProject(project: Project): string[] {
@@ -110,14 +110,14 @@ export function validateProject(project: Project): string[] {
     (['portrait', 'landscape'] as Orientation[]).forEach((orientation) => {
       const layout = project.layouts[layoutKey(count, orientation)];
       // Skip layouts the user never touched -- only warn about ones with actual content.
-      if (!layout.enabled || layout.layers.length === 0) return;
+      if (layout.layers.length === 0) return;
       const captures = layout.layers.filter((l): l is CaptureLayer => l.kind === 'capture');
       const numbers = new Set(captures.map((c) => c.number));
       if (captures.length === 0) {
         warnings.push(
-          `${count} photo(s) / ${orientation} is enabled but has no photo zone yet. pibooth will crash if a ` +
-            `session ever takes ${count} photo(s) in ${orientation}: finish this layout, or uncheck "Include this ` +
-            `layout in the export" for it.`
+          `${count} photo(s) / ${orientation} has elements but no photo zone yet. pibooth will crash if a ` +
+            `session ever takes ${count} photo(s) in ${orientation}: add the missing photo zone(s), or remove ` +
+            `this layout's elements if you don't need that combination.`
         );
       } else if (numbers.size !== count) {
         warnings.push(

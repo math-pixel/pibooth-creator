@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useStore } from '../store';
-import { buildTemplateXml, countEnabledLayouts, validateProject } from '../xmlExport';
+import { buildTemplateXml, countReadyLayouts, validateProject } from '../xmlExport';
 import { buildProjectZip, countEmbeddedImages } from '../projectIO';
 
 function downloadBlob(blob: Blob, filename: string) {
@@ -18,7 +18,7 @@ export default function ExportPanel() {
   const [copied, setCopied] = useState(false);
   const [zipping, setZipping] = useState(false);
   const warnings = useMemo(() => validateProject(project), [project]);
-  const layoutsCount = countEnabledLayouts(project);
+  const layoutsCount = countReadyLayouts(project);
   const imagesCount = countEmbeddedImages(project);
   const canExport = layoutsCount > 0 && warnings.length === 0;
 
@@ -50,6 +50,12 @@ export default function ExportPanel() {
   return (
     <section>
       <h2>Export</h2>
+      <div className="info-box">
+        pibooth supports up to <strong>8 templates</strong> — one per combination of photo count (1–4) and
+        orientation (portrait/landscape). Most setups only need one orientation per count, so building{' '}
+        <strong>4 of the 8</strong> is normal — just make sure you've covered every count/orientation your booth can
+        actually produce.
+      </div>
       {warnings.length > 0 ? (
         <>
           <p className="hint-small export-blocked">

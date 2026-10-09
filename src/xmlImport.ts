@@ -240,7 +240,7 @@ export function parseTemplateXml(xmlText: string): ImportResult {
     if (layouts[key].layers.length > 0) {
       warnings.push(`Page "${pageName}": another page already defined ${count} photo(s) / ${orientation}, this one replaced it.`);
     }
-    layouts[key] = { enabled: true, layers };
+    layouts[key] = { layers };
   });
 
   const project: Project = {

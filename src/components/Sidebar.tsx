@@ -13,7 +13,7 @@ function tabStatus(project: Project, count: CaptureCount): TabStatus {
   let best: TabStatus = 'empty';
   (['portrait', 'landscape'] as Orientation[]).forEach((o) => {
     const l = project.layouts[layoutKey(count, o)];
-    if (!l.enabled || l.layers.length === 0) return;
+    if (l.layers.length === 0) return;
     const captures = l.layers.filter((x) => x.kind === 'capture');
     const numbers = new Set(captures.map((c) => (c.kind === 'capture' ? c.number : 0)));
     if (numbers.size === count) best = 'ready';
@@ -34,7 +34,6 @@ export default function Sidebar() {
   const setCustomSize = useStore((s) => s.setCustomSize);
   const setActiveCount = useStore((s) => s.setActiveCount);
   const setActiveOrientation = useStore((s) => s.setActiveOrientation);
-  const setLayoutEnabled = useStore((s) => s.setLayoutEnabled);
   const duplicateFromPortrait = useStore((s) => s.duplicateFromPortrait);
   const addImageLayer = useStore((s) => s.addImageLayer);
   const addCaptureLayer = useStore((s) => s.addCaptureLayer);
@@ -198,14 +197,6 @@ export default function Sidebar() {
             </button>
           ))}
         </div>
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={layout?.enabled ?? false}
-            onChange={(e) => setLayoutEnabled(e.target.checked)}
-          />
-          Include this layout in the export
-        </label>
         {activeOrientation === 'landscape' && portraitLayout?.layers.length > 0 && (
           <button className="secondary" onClick={duplicateFromPortrait}>
             Duplicate from portrait (rotate 90°)

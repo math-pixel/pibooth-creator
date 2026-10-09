@@ -5,10 +5,7 @@ export function createEmptyLayouts(): Project['layouts'] {
   const layouts = {} as Project['layouts'];
   ([1, 2, 3, 4] as CaptureCount[]).forEach((count) => {
     (['portrait', 'landscape'] as Orientation[]).forEach((orientation) => {
-      layouts[layoutKey(count, orientation)] = {
-        enabled: orientation === 'portrait',
-        layers: [],
-      };
+      layouts[layoutKey(count, orientation)] = { layers: [] };
     });
   });
   return layouts;

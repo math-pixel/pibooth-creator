@@ -51,7 +51,6 @@ interface EditorState {
   setPageSizeId: (id: string) => void;
   setCustomSize: (shortIn: number, longIn: number) => void;
 
-  setLayoutEnabled: (enabled: boolean) => void;
   duplicateFromPortrait: () => void;
 
   addImageLayer: (dataUrl: string, label: string, position: 'background' | 'foreground') => void;
@@ -103,14 +102,6 @@ export const useStore = create<EditorState>((set, get) => ({
   setCustomSize: (shortIn, longIn) =>
     set((s) => ({ project: { ...s.project, customShortIn: shortIn, customLongIn: longIn } })),
 
-  setLayoutEnabled: (enabled) =>
-    set((s) => {
-      const key = layoutKey(s.activeCount, s.orientationByCount[s.activeCount]);
-      const layouts = { ...s.project.layouts };
-      layouts[key] = { ...layouts[key], enabled };
-      return { project: { ...s.project, layouts } };
-    }),
-
   duplicateFromPortrait: () =>
     set((s) => {
       const srcKey = layoutKey(s.activeCount, 'portrait');
@@ -127,7 +118,7 @@ export const useStore = create<EditorState>((set, get) => ({
         return { ...l, id: genId(l.kind), xIn: nx, yIn: ny, wIn: nw, hIn: nh };
       });
       const layouts = { ...s.project.layouts };
-      layouts[dstKey] = { enabled: true, layers };
+      layouts[dstKey] = { layers };
       return {
         project: { ...s.project, layouts },
         orientationByCount: { ...s.orientationByCount, [s.activeCount]: 'landscape' as Orientation },
